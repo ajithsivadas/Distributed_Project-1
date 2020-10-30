@@ -1,0 +1,317 @@
+/*
+Name:Ajith Sivadas
+Student ID: 1001829098
+
+Citation :I have watched and followed this youtube video for the Client side programming 
+            https://www.youtube.com/watch?v=ZzZeteJGncY&feature=youtu.be
+
+*/
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import static java.lang.Thread.sleep;
+import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JLabel;
+import javax.swing.Timer;
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/**
+ *
+ * @author ajihsivadas
+ */
+public class Myclient extends javax.swing.JFrame {
+/**
+ *Displaying the client in the UI and invoking the read class
+ * 
+ */
+    String UserName,clientID="";
+    Socket c;
+    DataInputStream din;
+    DataOutputStream dout;
+     String m;
+     String var=null;
+     Timer timer1 = null;
+     int v;
+     
+    /**
+     * Creates new form MyClient on running the code 
+     */
+    public Myclient() {
+        
+        initComponents();
+    }
+    
+    Myclient(String i, Socket s) {
+        UserName = i;
+        c = s;
+        try {
+            //every new client has to be opened in a seperate window and then sets the username 
+            initComponents();;
+            UserNameLabel.setText(i);
+            din = new DataInputStream(s.getInputStream());
+            dout = new DataOutputStream(s.getOutputStream());
+            new Read().start();
+            
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    class Read extends Thread {
+    /**
+    * Creating a thread for each of the clients
+    * 
+    */
+        public void run() {
+            while (true) {
+                try {
+                    //reading the number send from the server
+                    m = din.readUTF();
+                    //sending that number in the client UI
+                    Client_msg_box.append("" + m + "\n");
+                    v = Integer.parseInt(m);
+                    //Printing that the User is going to be suspended
+                    dout.writeUTF(UserName+" is getting Suspended for " +m+" seconds\n");
+                    //Suspending the client thread for the required number of sec given from the UI with a timmer in the UI
+                    new Timmer().start();
+                    //Suspending for that much sec
+                    sleep(v*1000);
+                    //checking if we clicked for resume button
+                    if(var==null)
+                    {
+                    String n= String.valueOf(m);
+                    dout.writeUTF(UserName+" has waited for "+m+" seconds\n");
+                    dout.writeUTF(UserName+" is connected\n");
+
+                    }
+                    else
+                    {
+                    //if resume is clicked then we set the value of the var to that much skip 
+                    int a = Integer.parseInt(var);
+                    int b = Integer.parseInt(m);
+                    //To figure out how much sec waited 
+                     a= b-a;
+                    String var= String.valueOf(a);
+                    dout.writeUTF(UserName+" has waited for "+var+" seconds\n");
+                    dout.writeUTF(UserName+" is opened\n");
+                    var=null;
+                    }
+                } catch (Exception ex) {
+                    break;
+                }
+            }
+        }
+    }
+    
+    class Timmer extends Thread{
+        public void run(){
+        /**
+        * A timer to Display in the UI
+        * 
+        */
+            //When the timer is running 
+            timer1 = new Timer(1000,new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    //checking if the timer reached 0 if not the value is decremented 
+                    if(v>0)
+                    {
+                    v--;
+                    }
+                    //if the timer reached zero then 
+                    else if (v==0)
+                    {
+                    //stoping the timmer
+                    timer1.stop();
+                    //setting the value in UI 
+                    timer_val.setText("00");
+                    }
+                 String n= String.valueOf(v);
+                 //seting the timer value in the UI
+                  timer_val.setText(n);
+                }
+                
+            });
+            timer1.start();
+            
+        }
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        Client_msg_box = new javax.swing.JTextArea();
+        Client_Label = new javax.swing.JLabel();
+        UserNameLabel = new javax.swing.JLabel();
+        Resume_button = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        timer_val = new javax.swing.JLabel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jPanel1.setBackground(new java.awt.Color(204, 204, 255));
+
+        Client_msg_box.setColumns(20);
+        Client_msg_box.setRows(5);
+        jScrollPane1.setViewportView(Client_msg_box);
+
+        Client_Label.setFont(new java.awt.Font("American Typewriter", 0, 24)); // NOI18N
+        Client_Label.setText("Client Username : ");
+
+        UserNameLabel.setFont(new java.awt.Font("American Typewriter", 0, 18)); // NOI18N
+        UserNameLabel.setText("----------------");
+
+        Resume_button.setText("Resume");
+        Resume_button.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Resume_buttonActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setFont(new java.awt.Font("American Typewriter", 1, 18)); // NOI18N
+        jLabel1.setText("00");
+
+        jLabel2.setFont(new java.awt.Font("American Typewriter", 0, 24)); // NOI18N
+        jLabel2.setText(":");
+
+        timer_val.setFont(new java.awt.Font("American Typewriter", 1, 18)); // NOI18N
+        timer_val.setText("00");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(Client_Label)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(UserNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(Resume_button, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(15, 15, 15))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(timer_val)
+                .addGap(69, 69, 69))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(36, 36, 36)
+                        .addComponent(Resume_button))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(43, 43, 43)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(Client_Label)
+                            .addComponent(UserNameLabel))))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2)
+                    .addComponent(timer_val))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(29, 29, 29))
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void Resume_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Resume_buttonActionPerformed
+        // When the Resume button 
+        JLabel timer_count =timer_val;
+        //getting the value of the sec waited 
+        var= timer_count.getText();
+        v=0;
+        //stoping the timmer 
+        timer1.stop();
+        //setting the UI back again 
+        timer_val.setText("00");
+    }//GEN-LAST:event_Resume_buttonActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(Myclient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(Myclient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(Myclient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(Myclient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new Myclient().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel Client_Label;
+    private javax.swing.JTextArea Client_msg_box;
+    private javax.swing.JButton Resume_button;
+    private javax.swing.JLabel UserNameLabel;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel timer_val;
+    // End of variables declaration//GEN-END:variables
+}
